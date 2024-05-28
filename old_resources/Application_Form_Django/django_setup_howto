@@ -1,0 +1,217 @@
+The method to create a django project is bottom up approach-
+1)create models (database)
+2)create views and templates
+
+
+SETTING UP DJANGO PROJECT AND APP
+
+    (in terminal)
+    pip install django
+    django-admin startproject mysite .
+    // a directory called mysite will be created with necessary .py files
+    // your django project is now setup
+
+NOTE: after this step a directory called mysite( which contains .py files) and manage.py should appear in the project directory
+
+Sometimes only one directory called mysite will be created inside which there will be mysite directory and manage.py
+If this happens-
+	move those to outside to the project directroy
+	then in terminal run command - python manage.py migrate 
+	now continue
+
+
+
+    (in terminal)
+    python manage.py startapp app_name
+
+    go-to >  mysite/settings.py
+    locate INSTALLED_APPS variable and to that list add a string item   = 'app_name'
+    // ( app_name was written after startapp in terminal command)
+
+    // now your app is created in the form of a directory named app_name
+
+SETTING UP DATABASE MODELS (ie database )
+
+    (in terminal)
+    python manage.py makemigrations
+
+    // a directory called  migrations will be created
+
+    go-to > app_name/models.py
+    in models.py you will create you database class-
+    (class Template)
+    class Xyz(models.Model):
+        col_1 = models.CharField(max_length=80)
+        col_2 = models.EmailField()
+        col_3 = models.DateField()
+
+        def __str__(self):
+            return "instance string representation"
+
+
+    (in terminal)
+    python manage.py migrate
+
+    //
+    now with db bowser open the db.sqlite3 .db file in your project directory
+    it will contain many tables , find the one with the name 'app_name_xyz'
+    That is your main table which you will use
+
+
+CREATING VIEW AND TEMPLATE
+
+    1)go to app_name/views.py
+    create your view functions/classes in this file
+
+    # example
+        from django.shortcuts import render
+
+        def index(request):
+        return render(request, "abc.html")
+
+    2)create a 'templates' directory in app_name/  and then place you .html files in it
+    3)create url.py in app_name/
+
+    # Content of url.py( note : abc.html exists in templates and index() exists in views.py
+
+        from django.urls import path
+        from . import views
+
+        urlpatterns = [
+            path('', views.index, name = 'abc')
+        ]
+
+    4)go to mysite/urls.py
+    # add the following lines to the code
+    from django.urls import include
+
+    #( in the urlpatterns list add element)
+    path('', include('app_name.url')
+
+
+
+
+.HTML FROM FLASK TO DJANGO
+99% of the code of .html file is same for flask and django thus simply reuse the .html file
+
+note:
+{% with messages = get_flashed_messages() %} is specific for flask and does not work on django
+
+# you will have to add the following line below <form method ='post'> line if you are using django
+{% csrf_token %}
+
+IF YOU HAVE A FORM ELEMENT ON THE WEBSITE THEN
+    create forms.py in app_name/
+    and create a form class
+
+    exmaple
+    from django import forms
+
+    class ApplicationForm(forms.Form):
+        col_1 = forms.CharField(max_length=80)
+        col_2 = forms.EmailField()
+        col_3 = forms.DateField()
+
+
+    // NOTE  this is almost identical to the class we created in app_name/models.py
+    #models.py is for database
+    #froms.py is for html forms
+
+    //import this class in views.py
+
+TO SEND EMAILS
+    #you will have to specify the email sender , for that
+    go to mysite/settings.py
+    #write the following code at the end of file
+
+        import os
+
+        EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+        EMAIL_HOST = 'smtp.gmail.com'
+        EMAIL_PORT = 587
+        EMAIL_USE_TLS = True
+        EMAIL_HOST_USER = 'mahajanshubham54321@gmail.com'
+        EMAIL_HOST_PASSWORD = os.getenv("password_for_python_app")
+
+    # code to write in views.py(example)
+        message_body =  f"Thank you for your submission ,{first_name}." \
+                      f"Here are your submitted data:\n{first_name}\n{last_name}\n" \
+                      f"{date}\n{occupation}\n Thank You!"
+
+        subject="Form Submission Confirmation"
+        email_message = EmailMessage(subject,message_body,to=[email])
+        email_message.send()
+
+TO CREATE ADMIN INTERFACE
+    in app_name/admin.py add the following lines-
+        from .models import Form
+
+        admin.site.register(Form)
+        # note a class Form exits in app_name/models.py
+
+       in your homepage url just add /admin to go to django admin interface
+       it will ask for user name and password
+       to get user name and password you will need to create a super user
+
+       In terminal write-
+        python manage.py createsuperuser
+
+        # then enter all details asked
+        # then rebot the app with run server
+
+TO MODIFY ADMIN INTERFACE
+    in app_name/admin.py create a class-
+        class ABC(admin.ModelAdmin):
+        list_display = ( # column names of form table)
+        search_fields = ( # column names)
+        list_filter = (#column names)
+
+    then add the class ABC you created to the admin.site.register()
+        admin.site.register(previosly included classes , ABC)
+
+CREATING BASE TEMPLATE
+    duplicate your index.html file in appname/templates/  and name it as base.html
+
+    now delete all the content other than body tag content from .html files
+    note - body tag content means the actual content displayed on the web page
+
+
+    and in base.html keep only the code of stylings vaghera (head tag title tag vaghera)
+
+    observe the jinja2 coding used in this project
+
+        in base.html
+            {% block content %}
+            {% endblock %}
+
+        enclose the code of other html files within
+            {% extends 'base.html' %}
+            {% block content %}
+
+            <h1 class="mt-4 mb-4"> CONTENT HERE</h1>
+
+            {% endblock %}
+
+
+
+
+
+RUNNING APP ON BROWSER
+
+//to run your app on browser in terminal write
+python manage.py runserver
+
+if you get error then to trouble shoot it look at the 'Exception Location' in the error
+ message to understand where the error is happenening
+
+
+
+UNDERSTANDING THE FILE SYSTEM OF DJANGO
+
+models.py = for databases
+views.py = for defining functions/classes that interact with the .html files
+admin.py = for admin interface config
+
+app_name/url.py and urls.py = for webpage url defining
+
+settings.py = for prject config

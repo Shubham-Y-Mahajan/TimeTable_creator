@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <h1 class="pt-5">{{ item.meal }} </h1>
+  <!-- in views.py the model 'Item' was declared thus you can use item. -->
+  <p>{{ item.description }}</p>
+  <p>{{ item.price }}</p>
+</div>
+{% endblock content %}

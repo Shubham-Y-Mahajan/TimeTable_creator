@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class = "container">
+    <h1>Restaurant Menu</h1>
+    <ul class="list-group list-group-flush">
+    {% for meal in meals %}
+    <h2 class ="pt-5">{{  meal.1 }}</h2>  <!-- .1 is the index value in tuple -->
+
+    <!-- below code will acess the database -->
+        {% for row in item_list %}
+        <!-- item_list is a special variable - item is the class name defined in models.py
+        (lowercase version) item_list will return a list of all the database records -->
+                {% if row.meal_type == meal.0 %}
+                    {% if row.status == 0 %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center border-0 pb-0">
+                        <a href = "{% url 'menu_item' row.pk %}"><h3><del>{{ row.meal }}</del></h3></a>
+                        <span class="badge bg-primary rounded-pill">{{ row.price }}</span>
+                    </li>
+                        <!--
+                        the ur name "menu_item" has been defined in app_name/url.py
+                        row.pk refers to the primary key (index) of the row
+                        del tag for strike through
+                         -->
+                    {% else %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center border-0 pb-0">
+                        <a href = "{% url 'menu_item' row.pk %}"><h3>{{ row.meal }}</h3></a>
+                        <span class="badge bg-primary rounded-pill">{{ row.price }}</span>
+                    </li>
+
+                    {% endif %}
+                    <li class="list-group-item pt-0">
+                        <p>{{ row.description }}</p>
+                    </li>
+                {% endif %}
+
+        {% endfor %}
+    {% endfor %}
+    </ul>
+</div>
+
+{% endblock content %}
