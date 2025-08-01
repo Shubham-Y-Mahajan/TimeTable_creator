@@ -24,9 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-oqd)n*ontan)pw1^)o=8u)5jwkn7xh)lc#qb(*$-5y%&h%8-@c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'timetable-creator-n51f.onrender.com',
+    'localhost',
+    '127.0.0.1'
+]
+
 
 
 # Application definition
