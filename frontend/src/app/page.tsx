@@ -28,12 +28,15 @@ export default function Home() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch(`${backendDomain}/get_all_courses/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `https://timetable-creator-n51f.onrender.com/get_all_courses/`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         if (!response.ok) {
           console.log("Get All Courses API could not be triggered properly");
           throw new Error(
@@ -159,13 +162,16 @@ export default function Home() {
   const handleGenerateTimetable = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${backendDomain}/submit/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ course_id_list: selectedCourses }),
-      });
+      const response = await fetch(
+        `https://timetable-creator-n51f.onrender.com/submit/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ course_id_list: selectedCourses }),
+        }
+      );
 
       if (!response.ok) {
         console.log("Submit the selections API could not be triggered");
