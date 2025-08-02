@@ -1,4 +1,4 @@
-export const backendDomain = "https://timetable-creator-n51f.onrender.com/";
+export const backendDomain = "https://timetable-creator-n51f.onrender.com";
 
 export interface Course {
   id: number;
