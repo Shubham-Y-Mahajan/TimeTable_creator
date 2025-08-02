@@ -13,3 +13,5 @@ export const isNotCourse = (value: string | string[]): boolean => {
 
 export const arraysEqual = (a: string[], b: string[]) =>
   a.length === b.length && a.every((val) => b.includes(val));
+
+//dummy push
