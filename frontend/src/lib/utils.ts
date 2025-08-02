@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const isNotCourse = (value: string | string[]): boolean => {
@@ -13,4 +13,3 @@ export const isNotCourse = (value: string | string[]): boolean => {
 
 export const arraysEqual = (a: string[], b: string[]) =>
   a.length === b.length && a.every((val) => b.includes(val));
-
