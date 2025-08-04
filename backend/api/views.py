@@ -43,7 +43,7 @@ USER_AGENTS = [
 ]
 
 @api_view(["GET"])
-def real_user_post_ping(request):
+def real_user_ping(request):
     try:
         chosen_ua = random.choice(USER_AGENTS)
         target_url = "https://timetable-creator-n51f.onrender.com/submit/"

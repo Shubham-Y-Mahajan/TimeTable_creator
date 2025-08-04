@@ -26,4 +26,5 @@ urlpatterns = [
 
     path('get_all_courses/', get_all_courses, name='get_all_courses'),
     path('submit/', submit_selection, name='submit_selection'),
+    path('real_user_ping/', real_user_ping, name='real_user_ping'),
 ]
