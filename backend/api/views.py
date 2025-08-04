@@ -44,31 +44,30 @@ USER_AGENTS = [
 
 @api_view(["GET"])
 def real_user_ping(request):
+    """
+        used to call student forum's api to prevent circular calling
+        (calling request on your own instance causes deadlock)
+    """
     try:
         chosen_ua = random.choice(USER_AGENTS)
-        target_url = "https://timetable-creator-n51f.onrender.com/submit/"
+        target_url = f"https://iit-bhilai-student-forum.onrender.com/get_analytics/"
 
         headers = {
-            "User-Agent": chosen_ua,
-            "Content-Type": "application/json"
+            "User-Agent": chosen_ua
         }
 
-        payload = {
-            "course_id_list": [101, 102]
-        }
-
-        post_response = requests.post(target_url, json=payload, headers=headers)
+        internal_response = requests.get(target_url, headers=headers)
 
         return Response({
-            "message": "POST ping sent to external timetable API",
+            "message": "Pinged /get_analytics/ as a browser",
             "target_url": target_url,
             "user_agent_used": chosen_ua,
-            "status_code": post_response.status_code,
-            "response_body": post_response.text[:300]  # optional: truncate to avoid log clutter
+            "status_code": internal_response.status_code,
+            "internal_response": internal_response
         })
 
     except Exception as e:
         return Response({
-            "message": "POST ping failed",
+            "message": "Ping failed",
             "error": str(e)
         }, status=500)
