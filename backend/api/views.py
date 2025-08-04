@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from .models import CourseData
 from .serializers import CourseSerializer
 from .backend import process_submission
+import random
+import requests
 @api_view(['GET'])
 def get_all_courses(request):
     courses = CourseData.objects.all()  # Fetch all courses
@@ -30,3 +32,43 @@ def submit_selection(request):
     else:
         grid_map, clashes, additional_messages = content
         return Response({'mapping': grid_map,'clashes':clashes,'additional_messages':additional_messages}, status=status.HTTP_200_OK)
+
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15",
+    "Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/116.0",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 16_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
+    "Mozilla/5.0 (iPad; CPU OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1",
+    "Mozilla/5.0 (Android 10; Mobile; rv:79.0) Gecko/79.0 Firefox/79.0",
+]
+
+@api_view(["GET"])
+def real_user_post_ping(request):
+    try:
+        chosen_ua = random.choice(USER_AGENTS)
+        target_url = "https://timetable-creator-n51f.onrender.com/submit/"
+
+        headers = {
+            "User-Agent": chosen_ua,
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "course_id_list": [101, 102]
+        }
+
+        post_response = requests.post(target_url, json=payload, headers=headers)
+
+        return Response({
+            "message": "POST ping sent to external timetable API",
+            "target_url": target_url,
+            "user_agent_used": chosen_ua,
+            "status_code": post_response.status_code,
+            "response_body": post_response.text[:300]  # optional: truncate to avoid log clutter
+        })
+
+    except Exception as e:
+        return Response({
+            "message": "POST ping failed",
+            "error": str(e)
+        }, status=500)
