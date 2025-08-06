@@ -59,11 +59,8 @@ def real_user_ping(request):
         internal_response = requests.get(target_url, headers=headers)
 
         return Response({
-            "message": "Pinged /get_analytics/ as a browser",
             "target_url": target_url,
-            "user_agent_used": chosen_ua,
-            "status_code": internal_response.status_code,
-            "internal_response": internal_response.text[:200]  # optional: truncate to avoid log clutter
+            "status_code": internal_response.status_code
         })
 
     except Exception as e:
