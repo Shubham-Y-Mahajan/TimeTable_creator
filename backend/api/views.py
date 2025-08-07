@@ -42,7 +42,7 @@ USER_AGENTS = [
     "Mozilla/5.0 (Android 10; Mobile; rv:79.0) Gecko/79.0 Firefox/79.0",
 ]
 
-@api_view(["GET"])
+@api_view(["GET","HEAD"])
 def real_user_ping(request):
     """
         used to call student forum's api to prevent circular calling
@@ -61,7 +61,7 @@ def real_user_ping(request):
         return Response({
             "target_url": target_url,
             "status_code": internal_response.status_code
-        })
+        },status=200)
 
     except Exception as e:
         return Response({
