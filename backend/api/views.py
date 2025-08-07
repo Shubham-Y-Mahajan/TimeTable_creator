@@ -48,23 +48,15 @@ def real_user_ping(request):
         used to call student forum's api to prevent circular calling
         (calling request on your own instance causes deadlock)
     """
-    try:
-        chosen_ua = random.choice(USER_AGENTS)
-        target_url = f"https://iit-bhilai-student-forum.onrender.com/get_analytics/"
 
-        headers = {
-            "User-Agent": chosen_ua
-        }
+    chosen_ua = random.choice(USER_AGENTS)
+    target_url = f"https://iit-bhilai-student-forum.onrender.com/get_analytics/"
 
-        internal_response = requests.get(target_url, headers=headers)
+    headers = {
+        "User-Agent": chosen_ua
+    }
 
-        return Response({
-            "target_url": target_url,
-            "status_code": internal_response.status_code
-        },status=200)
+    internal_response = requests.get(target_url, headers=headers)
 
-    except Exception as e:
-        return Response({
-            "message": "Ping failed",
-            "error": str(e)
-        }, status=500)
+    return Response("warmup",status=internal_response.status_code)
+
