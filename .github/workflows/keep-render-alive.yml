@@ -2,9 +2,9 @@ name: Keep Render Backends Warm
 
 on:
   schedule:
-    # Every 11 minutes (cron is UTC)
+    # Every 11 minutes (UTC)
     - cron: "*/11 * * * *"
-  workflow_dispatch: {}  # lets you run it manually from the Actions tab
+  workflow_dispatch: {}  # allows manual trigger
 
 permissions:
   contents: read
@@ -40,7 +40,10 @@ jobs:
           set -euxo pipefail
           curl -fsS \
             -A "${{ steps.ua.outputs.ua_a }}" \
-            -H "Accept: application/json" \
+            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" \
+            -H "Accept-Language: en-US,en;q=0.9" \
+            -H "Connection: keep-alive" \
+            -H "Referer: https://google.com" \
             --retry 3 --retry-delay 2 --max-time 20 \
             "https://iit-bhilai-student-forum.onrender.com/warmup"
 
@@ -49,8 +52,11 @@ jobs:
           set -euxo pipefail
           curl -fsS \
             -A "${{ steps.ua.outputs.ua_b }}" \
+            -H "Accept: application/json, text/javascript, */*; q=0.01" \
+            -H "Accept-Language: en-US,en;q=0.9" \
+            -H "Connection: keep-alive" \
+            -H "Referer: https://google.com" \
             -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
             --retry 3 --retry-delay 2 --max-time 30 \
             -d '{"course_id_list":[101,102]}' \
             "https://timetable-creator-n51f.onrender.com/submit/"
