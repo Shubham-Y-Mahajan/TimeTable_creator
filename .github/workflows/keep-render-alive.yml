@@ -2,8 +2,8 @@ name: Keep Render Backends Warm
 
 on:
   schedule:
-    # Every 11 minutes (UTC)
-    - cron: "*/11 * * * *"
+    # Every 8 minutes (UTC)
+    - cron: "*/8 * * * *"
   workflow_dispatch: {}  # allows manual trigger
 
 permissions:
