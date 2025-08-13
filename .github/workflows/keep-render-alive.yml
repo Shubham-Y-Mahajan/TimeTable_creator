@@ -1,0 +1,56 @@
+name: Keep Render Backends Warm
+
+on:
+  schedule:
+    # Every 11 minutes (cron is UTC)
+    - cron: "*/11 * * * *"
+  workflow_dispatch: {}  # lets you run it manually from the Actions tab
+
+permissions:
+  contents: read
+
+jobs:
+  warm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Pick random User-Agents for each request
+        id: ua
+        run: |
+          UAS=(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
+            "Mozilla/5.0 (X11; Linux x86_64)"
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)"
+            "Mozilla/5.0 (iPad; CPU OS 15_0 like Mac OS X)"
+            "Mozilla/5.0 (Android 10; Mobile; rv:79.0) Gecko/79.0 Firefox/79.0"
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"
+          )
+          UA_A=${UAS[$RANDOM % ${#UAS[@]}]}
+          UA_B=${UAS[$RANDOM % ${#UAS[@]}]}
+          echo "ua_a=$UA_A" >> "$GITHUB_OUTPUT"
+          echo "ua_b=$UA_B" >> "$GITHUB_OUTPUT"
+
+      - name: Random jitter (0–59s) to avoid obvious patterns
+        run: sleep $((RANDOM % 60))
+
+      - name: App A — GET /warmup
+        run: |
+          set -euxo pipefail
+          curl -fsS \
+            -A "${{ steps.ua.outputs.ua_a }}" \
+            -H "Accept: application/json" \
+            --retry 3 --retry-delay 2 --max-time 20 \
+            "https://iit-bhilai-student-forum.onrender.com/warmup"
+
+      - name: App B — POST /submit/ with JSON payload
+        run: |
+          set -euxo pipefail
+          curl -fsS \
+            -A "${{ steps.ua.outputs.ua_b }}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --retry 3 --retry-delay 2 --max-time 30 \
+            -d '{"course_id_list":[101,102]}' \
+            "https://timetable-creator-n51f.onrender.com/submit/"
