@@ -1,3 +1,5 @@
+import time
+
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -55,7 +57,8 @@ def real_user_ping(request):
     headers = {
         "User-Agent": chosen_ua
     }
-
+    # Add 5 second delay before making the request
+    time.sleep(5)
     internal_response = requests.get(target_url, headers=headers)
 
     return Response("warmup",status=internal_response.status_code)
