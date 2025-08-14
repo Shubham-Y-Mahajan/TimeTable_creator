@@ -36,6 +36,7 @@ jobs:
         run: sleep $((RANDOM % 60))
 
       - name: Ping both apps in parallel
+        continue-on-error: true
         run: |
           set -euxo pipefail
           (
