@@ -2,8 +2,8 @@ name: Keep Render Backends Warm
 
 on:
   schedule:
-    # Every 8 minutes (UTC)
-    - cron: "*/8 * * * *"
+    # Every 12 minutes (UTC)
+    - cron: "*/12 * * * *"
   workflow_dispatch: {}  # allows manual trigger
 
 permissions:
@@ -35,28 +35,29 @@ jobs:
       - name: Random jitter (0–59s) to avoid obvious patterns
         run: sleep $((RANDOM % 60))
 
-      - name: App A — GET /warmup
+      - name: Ping both apps in parallel
         run: |
           set -euxo pipefail
-          curl -fsS \
-            -A "${{ steps.ua.outputs.ua_a }}" \
-            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" \
-            -H "Accept-Language: en-US,en;q=0.9" \
-            -H "Connection: keep-alive" \
-            -H "Referer: https://google.com" \
-            --retry 3 --retry-delay 2 --max-time 20 \
-            "https://iit-bhilai-student-forum.onrender.com/warmup"
-
-      - name: App B — POST /submit/ with JSON payload
-        run: |
-          set -euxo pipefail
-          curl -fsS \
-            -A "${{ steps.ua.outputs.ua_b }}" \
-            -H "Accept: application/json, text/javascript, */*; q=0.01" \
-            -H "Accept-Language: en-US,en;q=0.9" \
-            -H "Connection: keep-alive" \
-            -H "Referer: https://google.com" \
-            -H "Content-Type: application/json" \
-            --retry 3 --retry-delay 2 --max-time 30 \
-            -d '{"course_id_list":[101,102]}' \
-            "https://timetable-creator-n51f.onrender.com/submit/"
+          (
+            echo "App A status:"
+            curl -s -o /dev/null -w "%{http_code}\n" \
+              -A "${{ steps.ua.outputs.ua_a }}" \
+              -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" \
+              -H "Accept-Language: en-US,en;q=0.9" \
+              -H "Connection: keep-alive" \
+              -H "Referer: https://google.com" \
+              --retry 3 --retry-delay 2 --max-time 60 \
+              "https://iit-bhilai-student-forum.onrender.com/warmup"
+          ) &
+          (
+            echo "App B status:"
+            curl -s -o /dev/null -w "%{http_code}\n" \
+              -A "${{ steps.ua.outputs.ua_b }}" \
+              -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" \
+              -H "Accept-Language: en-US,en;q=0.9" \
+              -H "Connection: keep-alive" \
+              -H "Referer: https://google.com" \
+              --retry 3 --retry-delay 2 --max-time 60 \
+              "https://timetable-creator-n51f.onrender.com/get_all_courses/"
+          ) &
+          wait
