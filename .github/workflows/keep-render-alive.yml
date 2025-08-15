@@ -40,25 +40,25 @@ jobs:
         run: |
           set -euxo pipefail
           (
-            echo "App A status:"
-            curl -o /dev/null -w "%{http_code}\n" \
+            echo -n "App A status: "
+            curl -sS -o /dev/null -w "%{http_code}\n" \
               -A "${{ steps.ua.outputs.ua_a }}" \
               -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" \
               -H "Accept-Language: en-US,en;q=0.9" \
               -H "Connection: keep-alive" \
               -H "Referer: https://google.com" \
-              --retry 3 --retry-delay 2 --max-time 60 \
+              --retry 3 --retry-delay 2 --retry-all-errors --max-time 60 \
               "https://iit-bhilai-student-forum.onrender.com/warmup/"
           ) &
           (
-            echo "App B status:"
-            curl -o /dev/null -w "%{http_code}\n" \
+            echo -n "App B status: "
+            curl -sS -o /dev/null -w "%{http_code}\n" \
               -A "${{ steps.ua.outputs.ua_b }}" \
               -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" \
               -H "Accept-Language: en-US,en;q=0.9" \
               -H "Connection: keep-alive" \
               -H "Referer: https://google.com" \
-              --retry 3 --retry-delay 2 --max-time 60 \
+              --retry 3 --retry-delay 2 --retry-all-errors --max-time 60 \
               "https://timetable-creator-n51f.onrender.com/get_all_courses/"
           ) &
           wait
